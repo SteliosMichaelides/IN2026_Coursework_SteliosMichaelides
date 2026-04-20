@@ -4,8 +4,9 @@
 #include "GameUtil.h"
 #include "GameObject.h"
 #include "Shape.h"
+#include "IPowerUpListener.h"
 
-class Spaceship : public GameObject
+class Spaceship : public GameObject, public IPowerUpListener
 {
 public:
 	Spaceship();
@@ -27,12 +28,22 @@ public:
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList &objects);
 
+	void OnPowerUpCollected(PowerUpType type);
+
+    bool IsInvulnerable() const { return mInvulnerabilityTime > 0; }
+    bool HasWeaponUpgrade() const { return mWeaponUpgradeTime > 0; }
+
 private:
 	float mThrust;
 
 	shared_ptr<Shape> mSpaceshipShape;
 	shared_ptr<Shape> mThrusterShape;
 	shared_ptr<Shape> mBulletShape;
+
+	int mInvulnerabilityTime;
+    int mWeaponUpgradeTime;
+    int mBlinkTimer;
+    bool mBlinkVisible;
 };
 
 #endif
