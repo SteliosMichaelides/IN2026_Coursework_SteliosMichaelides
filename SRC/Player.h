@@ -34,10 +34,38 @@ public:
 	void FirePlayerKilled()
 	{
 		// Send message to all listeners
-		for (PlayerListenerList::iterator lit = mListeners.begin();
-			lit != mListeners.end(); ++lit) {
+		for (PlayerListenerList::iterator lit = mListeners.begin(); lit != mListeners.end(); ++lit)
+		{
 			(*lit)->OnPlayerKilled(mLives);
 		}
+	}
+
+	// When lives count changes for no death reason
+	void FireLivesChanged()
+    {
+        for (PlayerListenerList::iterator lit = mListeners.begin(); lit != mListeners.end(); ++lit)
+		{
+            (*lit)->OnLivesChanged(mLives);
+        }
+    }
+	
+	// Extra life from power up
+	void AddLife()
+    {
+        mLives += 1;
+        FireLivesChanged();
+    }
+
+	int GetLives() const
+	{
+		return mLives;
+	}
+
+	// Reset forn a new game
+	void Reset()
+	{
+		mLives = 3;
+		FireLivesChanged();
 	}
 
 private:
