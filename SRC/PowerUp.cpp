@@ -39,6 +39,18 @@ bool PowerUp::CollisionTest(shared_ptr<GameObject> o)
 
 void PowerUp::OnCollision(const GameObjectList& objects)
 {
+    bool ship_collided = false;
+    for (GameObjectList::const_iterator it = objects.begin(); it != objects.end(); ++it)
+    {
+        if ((*it)->GetType() == GameObjectType("Spaceship")) {
+            ship_collided = true;
+            break;
+        }
+    }
+
+    // Ignore the collision if its not with the spaceship
+    if (!ship_collided) return;
+
     if (sListener != NULL) {
         sListener->OnPowerUpCollected(mPowerUpType);
     }

@@ -22,6 +22,12 @@ Asteroid::~Asteroid(void)
 bool Asteroid::CollisionTest(shared_ptr<GameObject> o)
 {
 	if (GetType() == o->GetType()) return false;
+
+	// Asteroids should not collide with powerups
+	if (o->GetType() == GameObjectType("ExtraLifePowerUp")) return false;
+	if (o->GetType() == GameObjectType("InvulnerabilityPowerUp")) return false;
+	if (o->GetType() == GameObjectType("WeaponUpgradePowerUp")) return false;
+
 	if (mBoundingShape.get() == NULL) return false;
 	if (o->GetBoundingShape().get() == NULL) return false;
 	return mBoundingShape->CollisionTest(o->GetBoundingShape());
