@@ -4,6 +4,7 @@
 class IScoreListener
 {
 public:
+	virtual ~IScoreListener() {}
 	virtual void OnScoreChanged(int score) = 0;
 };
 
