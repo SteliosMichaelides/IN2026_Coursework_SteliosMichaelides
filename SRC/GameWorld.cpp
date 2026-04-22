@@ -99,6 +99,14 @@ void GameWorld::RemoveObject(shared_ptr<GameObject> ptr)
 	FireObjectRemoved(ptr);
 }
 
+/** Flag every object for removal. */
+void GameWorld::ClearAll()
+{
+    for (GameObjectList::iterator it = mGameObjects.begin(); it != mGameObjects.end(); ++it) {
+        mGameObjectsToRemove.push_back(*it);
+    }
+}
+
 /** Inform all listeners of world update. */
 void GameWorld::FireWorldUpdated()
 {
