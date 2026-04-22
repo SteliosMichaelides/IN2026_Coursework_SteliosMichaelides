@@ -94,7 +94,7 @@ void Spaceship::Rotate(float r)
 	mRotation = r;
 }
 
-/** Shoot a bullet (or 3 bbullets when weapon upgrade is active). */
+/** Shoot a bullet (or 3 bullets when weapon upgrade is active). */
 void Spaceship::Shoot(void)
 {
 	// Check the world exists
@@ -111,13 +111,13 @@ void Spaceship::Shoot(void)
     {
         float fire_angle = mAngle + angle_offsets[i];
 		// Construct a unit length vector in the direction the spaceship is headed
-		GLVector3f spaceship_heading(cos(DEG2RAD*mAngle), sin(DEG2RAD*mAngle), 0);
-		spaceship_heading.normalize();
+		GLVector3f bullet_heading(cos(DEG2RAD*fire_angle), sin(DEG2RAD*fire_angle), 0);
+		bullet_heading.normalize();
 
 		// Calculate the point at the node of the spaceship from position and heading
-		GLVector3f bullet_position = mPosition + (spaceship_heading * 4);
+		GLVector3f bullet_position = mPosition + (bullet_heading * 4);
 		// Construct a vector for the bullet's velocity
-		GLVector3f bullet_velocity = mVelocity + spaceship_heading * bullet_speed;
+		GLVector3f bullet_velocity = mVelocity + bullet_heading * bullet_speed;
 
 		// Construct a new bullet
 		shared_ptr<GameObject> bullet
@@ -143,7 +143,14 @@ bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 void Spaceship::OnCollision(const GameObjectList &objects)
 {
 	if (IsInvulnerable()) return;
-	mWorld->FlagForRemoval(GetThisPtr());
+	for (GameObjectList::const_iterator it = objects.begin(); it != objects.end(); ++it)
+	{
+		if ((*it)->GetType() == GameObjectType("Asteroid"))
+		{
+			mWorld->FlagForRemoval(GetThisPtr());
+			return;
+		}
+	}
 }
 
 void Spaceship::OnPowerUpCollected(PowerUpType type)
