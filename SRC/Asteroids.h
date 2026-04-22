@@ -82,6 +82,9 @@ private:
 	void CreateGUI();
 	void CreateAsteroids(const uint num_asteroids);
 	shared_ptr<GameObject> CreateExplosion();
+	std::list< weak_ptr<GameObject> > mSpawnedObjects;
+
+
 
 	void ChangeState(GameState new_state);
     void StartNewGame();

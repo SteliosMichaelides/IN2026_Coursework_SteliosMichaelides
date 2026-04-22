@@ -26,9 +26,6 @@ public:
 	void RemoveObject( shared_ptr<GameObject> ptr );
 	void RemoveObject( GameObject* ptr );
 
-	// Flag every object for removal
-	void ClearAll();
-
 	// shared_ptr<GameObject> GetGameObject( string name );
 
 	void FlagForRemoval( GameObject* ptr );

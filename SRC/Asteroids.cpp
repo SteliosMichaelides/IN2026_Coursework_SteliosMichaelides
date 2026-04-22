@@ -133,20 +133,14 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 
 	if (mState == STATE_INSTRUCTIONS)
 	{
-		if (key == 27)
-			ChangeState(STATE_MENU); // ESC
-		return;
-	}
-	if (mState == STATE_INSTRUCTIONS)
-	{
-		if (key == 27)
+		if (key == 'b' || key == 'B')
 			ChangeState(STATE_MENU);
 		return;
 	}
 
 	if (mState == STATE_HIGH_SCORES)
 	{
-		if (key == 27)
+		if (key == 'b' || key == 'B')
 			ChangeState(STATE_MENU);
 		return;
 	}
@@ -165,11 +159,6 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 			if (!mPlayerNameInput.empty())
 				mPlayerNameInput.pop_back();
 			mNameEntryLabel->SetText("ENTER NAME: " + mPlayerNameInput + "_");
-		}
-		else if (key == 27) // ESC-skip entry
-		{
-			mPlayerNameInput = "";
-			ChangeState(STATE_MENU);
 		}
 		else if ((key >= 'A' && key <= 'Z') || (key >= 'a' && key <= 'z') ||
 				 (key >= '0' && key <= '9'))
@@ -340,8 +329,10 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 	mSpaceship->Reset();
 
 	// Make the spaceship the listener for powerups
-	PowerUp::SetListener(mSpaceship.get());
 	PowerUp::SetListener(this);
+
+	// Track for cleanup when game resets
+	mSpawnedObjects.push_back(weak_ptr<GameObject>(mSpaceship));
 
 	// Return the spaceship so it can be added to the world
 	return mSpaceship;
@@ -360,6 +351,9 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 		asteroid->SetSprite(asteroid_sprite);
 		asteroid->SetScale(0.2f);
 		mGameWorld->AddObject(asteroid);
+
+		// Track for cleanup when game resets
+		mSpawnedObjects.push_back(weak_ptr<GameObject>(asteroid));
 	}
 }
 
@@ -423,7 +417,7 @@ void Asteroids::CreateGUI()
 	mGameDisplay->GetContainer()->AddComponent(difficulty_component, GLVector2f(0.5f, 0.5f));
 
 	// Instructions
-	mInstructionsLabel = make_shared<GUILabel>("INSTRUCTIONS    ARROW KEYS: MOVE/TURN    SPACE: SHOOT    COLLECT POWER-UPS    ESC: BACK TO MENU");
+	mInstructionsLabel = make_shared<GUILabel>("INSTRUCTIONS    ARROW KEYS: MOVE/TURN    SPACE: SHOOT    COLLECT POWER-UPS    PRESS B TO RETURN TO MENU");
 	mInstructionsLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	mInstructionsLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	mInstructionsLabel->SetVisible(false);
@@ -558,8 +552,16 @@ void Asteroids::StartNewGame()
 
 void Asteroids::ResetGame()
 {
-	// Clear all objects so we start fresh
-	mGameWorld->ClearAll();
+	// Flag and clear every object that was spawned
+	for (std::list< weak_ptr<GameObject> >::iterator it = mSpawnedObjects.begin(); it != mSpawnedObjects.end(); ++it)
+	{
+		shared_ptr<GameObject> obj = it->lock();
+		if (obj) 
+		{
+			mGameWorld->FlagForRemoval(obj);
+		}
+	}
+	mSpawnedObjects.clear();
 
 	mLevel = 0;
 	mAsteroidCount = 0;
@@ -601,6 +603,9 @@ void Asteroids::SpawnPowerUp()
 	pu->SetPosition(pos);
 
 	mGameWorld->AddObject(pu);
+
+	// Track for cleanup when game resets
+	mSpawnedObjects.push_back(weak_ptr<GameObject>(pu));
 }
 
 void Asteroids::OnPowerUpCollected(PowerUpType type)

@@ -88,6 +88,6 @@ std::string HighScoreManager::GetFormattedTable() const
                 << mScores[i].name << " - " << mScores[i].score;
         }
     }
-    oss << "    Press ESC to return";
+    oss << "    Press B to return";
     return oss.str();
 }
