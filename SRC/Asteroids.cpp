@@ -65,6 +65,10 @@ void Asteroids::Start()
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
+	Animation* life_anim = AnimationManager::GetInstance().CreateAnimationFromFile("life", 256, 256, 256, 256, "heart.png");
+	Animation* invuln_anim = AnimationManager::GetInstance().CreateAnimationFromFile("invuln", 256, 256, 256, 256, "shield.png");
+	Animation* weapon_anim = AnimationManager::GetInstance().CreateAnimationFromFile("weapon", 256, 256, 256, 256, "pistol.png");
+
 	// Create a spaceship and add it to the world
 	// mGameWorld->AddObject(CreateSpaceship());
 
@@ -447,6 +451,14 @@ void Asteroids::CreateGUI()
 	mPowerUpStatusLabel->SetVisible(true);
 	shared_ptr<GUIComponent> powerup_status_component = static_pointer_cast<GUIComponent>(mPowerUpStatusLabel);
 	mGameDisplay->GetContainer()->AddComponent(powerup_status_component, GLVector2f(1.0f, 1.0f));
+
+	// Legend
+	mLegendLabel = make_shared<GUILabel>("POWER-UPS: HEART=+1 LIFE  SHIELD=INVULNERABLE  PISTOL=SPREAD-SHOT");
+	mLegendLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_RIGHT);
+	mLegendLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	mLegendLabel->SetVisible(false);
+	shared_ptr<GUIComponent> legend_component = static_pointer_cast<GUIComponent>(mLegendLabel);
+	mGameDisplay->GetContainer()->AddComponent(legend_component, GLVector2f(1.0f, 0.0f));
 }
 
 void Asteroids::OnScoreChanged(int score)
@@ -523,6 +535,7 @@ void Asteroids::ChangeState(GameState new_state)
 	case STATE_PLAYING:
 		mScoreLabel->SetVisible(true);
 		mLivesLabel->SetVisible(true);
+		mLegendLabel->SetVisible(true);
 		break;
 	case STATE_GAME_OVER_ENTRY:
 		mGameOverLabel->SetVisible(true);
@@ -575,28 +588,33 @@ void Asteroids::SpawnPowerUp()
 	// Pick a random type
 	int choice = rand() % 3;
 	shared_ptr<GameObject> pu;
+	const char* anim_name = NULL;
+
 	switch (choice)
 	{
 	case 0:
 		pu = make_shared<ExtraLifePowerUp>();
+		anim_name = "life";
 		break;
 	case 1:
 		pu = make_shared<InvulnerabilityPowerUp>();
+		anim_name = "invuln";
 		break;
 	case 2:
 		pu = make_shared<WeaponUpgradePowerUp>();
+		anim_name = "weapon";
 		break;
 	}
 
 	pu->SetBoundingShape(make_shared<BoundingSphere>(pu->GetThisPtr(), 6.0f));
 
 	// Re-use the asteroid sprite so power-ups are visible without new assets.
-	Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+	Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName(anim_name);
 	shared_ptr<Sprite> sprite =
 		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
 	sprite->SetLoopAnimation(true);
 	pu->SetSprite(sprite);
-	pu->SetScale(0.1f);
+	pu->SetScale(0.08f);
 
 	// Random spawn position inside world bounds
 	GLVector3f pos((float)((rand() % 200) - 100), (float)((rand() % 200) - 100), 0.0f);

@@ -70,6 +70,7 @@ private:
 	shared_ptr<GUILabel> mNameEntryLabel;
 	shared_ptr<GUILabel> mDifficultyLabel;
 	shared_ptr<GUILabel> mPowerUpStatusLabel;
+	shared_ptr<GUILabel> mLegendLabel;
 
 
 	uint mLevel;
