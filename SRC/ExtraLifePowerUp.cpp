@@ -1,7 +1,7 @@
 #include "ExtraLifePowerUp.h"
 
 ExtraLifePowerUp::ExtraLifePowerUp()
-    : PowerUp("ExtraLifePowerUp", POWERUP_EXTRA_LIFE)
+	: PowerUp("ExtraLifePowerUp", POWERUP_EXTRA_LIFE)
 {
 }
 

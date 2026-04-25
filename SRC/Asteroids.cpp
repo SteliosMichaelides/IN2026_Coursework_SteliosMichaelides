@@ -81,7 +81,8 @@ void Asteroids::Start()
 	// High scores
 	mHighScores.Load();
 
-	// Create some asteroids and add them to the world
+	// Create some decorative asteroids
+	// No spaceship, no score, lives or legend visible
 	CreateAsteroids(10);
 
 	// Create the GUI
@@ -281,7 +282,7 @@ void Asteroids::OnTimer(int value)
 	if (value == SHOW_GAME_OVER)
 	{
 		mGameOverLabel->SetVisible(true);
-		// After 20 seconds go to name entry (only if is highscore)
+		// After 2 seconds go to name entry (only if is highscore)
 		SetTimer(2000, GO_TO_NAME_ENTRY);
 	}
 
@@ -578,8 +579,8 @@ void Asteroids::ResetGame()
 
 	mLevel = 0;
 	mAsteroidCount = 0;
-	mPlayer.Reset();
-	mScoreKeeper.Reset();
+	mPlayer.Reset(); // Resets lives to 3
+	mScoreKeeper.Reset(); // Resets score to 0
 	mPowerUpStatusLabel->SetText("");
 }
 
@@ -608,10 +609,9 @@ void Asteroids::SpawnPowerUp()
 
 	pu->SetBoundingShape(make_shared<BoundingSphere>(pu->GetThisPtr(), 6.0f));
 
-	// Re-use the asteroid sprite so power-ups are visible without new assets.
+	// Use each power up's sprite
 	Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName(anim_name);
-	shared_ptr<Sprite> sprite =
-		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	shared_ptr<Sprite> sprite = make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
 	sprite->SetLoopAnimation(true);
 	pu->SetSprite(sprite);
 	pu->SetScale(0.08f);

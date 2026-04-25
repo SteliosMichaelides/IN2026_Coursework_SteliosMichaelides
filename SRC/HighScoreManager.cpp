@@ -61,14 +61,17 @@ void HighScoreManager::AddScore(const std::string &name, int score)
     std::string clean_name = name.empty() ? "PLAYER" : name;
     for (size_t i = 0; i < clean_name.size(); ++i)
     {
-        if (clean_name[i] == ' ')
+        if (clean_name[i] == ' ') {
             clean_name[i] = '_';
+        }
+            
     }
 
     mScores.push_back(HighScore(clean_name, score));
     std::sort(mScores.begin(), mScores.end());
-    if (mScores.size() > MAX_ENTRIES)
+    if (mScores.size() > MAX_ENTRIES) {
         mScores.resize(MAX_ENTRIES);
+    }
     Save();
 }
 
